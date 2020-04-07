@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+      <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://api.fontgraphy.ir/css?family=roya">
+
+    <title>قیمت ماشین شما چند است ؟</title>
+        <style>
+        body {
+                    background-color: whitesmoke;
+            font-family: 'roya';
+        }
+        #carlist {
+            text-align: center;
+        }
+            .card {
+                display: inline-block;
+                margin: 10px;
+            }
+    </style>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<br>
+
+<div class="container">
+    <div class="row">
+        <div class="alert alert-danger" id="notif" role="alert" style="width: 70%;margin: 0px auto; display: block; text-align: center; margin-bottom: 30px;">
+            همه رو پر کن
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <section id="carlist">
+                <h1>قیمت ماشین شما چقدر است ؟</h1>
+                <form style="direction: rtl">
+                    <label for="brand">برند ماشین خود را انتخاب کنید</label>
+                    <select id="brand" name="brandList" form="brandForm"></select>
+                    <br/>
+                    <label for="brand">مدل ماشین خود را انتخاب کنید</label>
+                    <select id="model" name="modelList" form="modelForm"></select>
+                    <br/>
+{#                    <label for="trim">تریم ماشین خود را انتخاب کنید</label>#}
+{#                    <select id="trim" name="trimList" form="trimForm"></select>#}
+{#                    <br/>#}
+                    <label for="year"> ماشین شما مدل جه سالی است؟</label>
+                    <input type="number" id="year" name="year">
+                    <br/>
+                    <label for="kilometer">کیلومتر ماشین شما چقدر است ؟</label>
+                    <input type="number" id="kilometer" name="kilometer">
+                </form>
+                <br/>
+                <br/>
+                <button type="button" class="btn btn-primary" id="predictor" style="margin-bottom: 20px;">محاسبه قیمت</button>
+                <h6 id="price"></h6><h6 id="toman" style="display: none;"> تومان</h6>
+                </section>
+        </div>
+    </div>
+</div>
+
+<script>
+function init(){
+    $.get("/getbrands", function(data, status){
+        ((Object.values(data))[0]).forEach(function(item, index){
+        $('#brand').append(`<option value="${item['id']}">${item['name']} </option>`);
+    });
+  });
+
+  $('#brand').on('change', function () {
+      $('#model').find('option').remove().end();
+      window.brand_id = $(this).val();
+      $.get("/getmodels/" + brand_id.toString(), function(data, status){
+        ((Object.values(data))[0]).forEach(function(item, index){
+        $('#model').append(`<option value="${item['id']}">${item['name']} </option>`);
+    });
+  });
+  });
+
+    $('#model').on('change', function () {
+      $('#trim').find('option').remove().end();
+      window.model_id = $(this).val();
+      $.get("/gettrims/" + model_id.toString(), function(data, status){
+        ((Object.values(data))[0]).forEach(function(item, index){
+        $('#model').append(`<option value="${item['id']}">${item['name']} </option>`);
+    });
+  });
+  });
+
+
+    $("#predictor").on('click', function () {
+        console.log($("#trim").val());
+        $.post( "/getprice/", { brand_id: window.brand_id , model_id: window.model_id , trim_id: 0, kilometer:$("#kilometer").val(), year:2016 } , function( data ) {
+                stringPrice = numberWithCommas(data['price']);
+                $("#price").html(stringPrice);
+                $("#toman").show();
+            });
+    });
+
+
+
+
+
+}
+
+function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+
+init();
+</script>
+
+</body>
+</body>
+</html>

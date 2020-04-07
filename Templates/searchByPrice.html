@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+      <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://api.fontgraphy.ir/css?family=roya">
+
+    <title>قیمت ماشین شما چند است ؟</title>
+        <style>
+        body {
+                    background-color: whitesmoke;
+            font-family: 'roya';
+        }
+        #carlist {
+            text-align: center;
+        }
+        #carlist-2 {
+            text-align: center;
+        }
+            .card {
+                display: inline-block;
+                margin: 10px;
+            }
+    </style>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <section id="carlist-2">
+                <h1>جستجو خودرو</h1>
+                <form style="direction: rtl">
+                    <label for="max">بیشترین قیمت</label>
+                    <input type="number" id="max" name="year">
+                    <br/>
+                    <label for="min">کمترین قیمت</label>
+                    <input type="number" id="min" name="kilometer">
+                </form>
+                <br/>
+                <br/>
+                <button type="button" class="btn btn-primary" id="search" style="margin-bottom: 20px;">جستجو</button>
+                </section>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <section id="carlist">
+
+            </section>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    function init() {
+    $("#search").on('click', function () {
+        maxPrice = $("#max").val();
+        if(maxPrice == '' || maxPrice == null) maxPrice = 0;
+        minPrice = $("#min").val();
+        if(minPrice == '' || minPrice == null) minPrice = 0;
+
+            $.post( "/getcars/", { 'max_price' : maxPrice, 'min_price' : minPrice } , function( data ) {
+                $('#carlist').find('div').remove().end();
+                ((Object.values(data))[0]).forEach(function(item, index) {
+                    $('#carlist').append(`
+
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">${item['brand']} - ${item['model']}</h5>
+    <p class="card-text">${item['price']} <span>تومان</span></p>
+    <a href="${item['price']}" class="btn btn-primary">صفحه محصول</a>
+  </div>
+</div>
+
+                    `);
+                });
+                });
+
+
+    });
+
+}
+
+init();
+
+</script>
+</body>
+</html>
